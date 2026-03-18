@@ -105,21 +105,21 @@ local function SendWebhook(rarity, color, user, fish, weight, chance)
         description = "_ _",
         color       = color,
         fields      = {
-            { name = "👤 Pemain",    value = "**"..user.."**",              inline = true },
-            { name = "🐟 Nama Ikan", value = "**"..cleanFish.."**",         inline = true },
+            { name = "👤 Player",    value = "**"..user.."**",              inline = true },
+            { name = "🐟 Fish Name", value = "**"..cleanFish.."**",         inline = true },
             { name = "⭐ Rarity",    value = "**"..rarity.."**",            inline = true },
-            { name = "⚖️ Berat",     value = "**"..weight.."**",            inline = true },
+            { name = "⚖️ Weigh",     value = "**"..weight.."**",            inline = true },
             { name = "🎲 Chance",    value = "**1 in "..chance.."**",       inline = true },
             { name = "🔬 Mutation",  value = "**"..(mutation or "-").."**", inline = true },
         },
-        footer    = { text = "Jago AI • Banjir Cuan" },
+        footer    = { text = "Metaverse Infinity Store" },
         timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
     }
     if imgUrl then embed.thumbnail = { url = imgUrl } end
 
     local payload = HttpService:JSONEncode({
-        username   = "Banjir Cuan Bot",
-        avatar_url = "https://cdn.discordapp.com/attachments/1438789446097961111/1483690995877941429/20260120_1811_Image_Generation_simple_compose_01kfdhkdvnf66vv5wdjrtntaj4.png?ex=69bb826b&is=69ba30eb&hm=3f9fc16bc4d2ca68ba95ebb7ab2766a46fd27e829f0afee66a5e6beaee5af50a&",
+        username   = "Metaverse Assistant",
+        avatar_url = "https://cdn.discordapp.com/attachments/1417502912120225902/1483757910365438143/20260120_1758_Image_Generation_simple_compose_01kfdgvazmfyhtj8x29hz580h9.png?ex=69bbc0bc&is=69ba6f3c&hm=64648ef4e7bf76a0c325483b1e9d559823aa68b412af19bb4511056d5e9f50ff&",
         embeds     = { embed }
     })
 
@@ -522,7 +522,7 @@ end)
 --  NOTIFIKASI AWAL
 -- ══════════════════════════════════════
 StarterGui:SetCore("SendNotification", {
-    Title = "✅ Banjir Cuan Aktif",
+    Title = "✅ Webhook Metaverse Aktiv",
     Text  = "Masukkan webhook di panel kiri.",
     Duration = 5
 })
