@@ -7,7 +7,7 @@ local TweenService    = game:GetService("TweenService")
 local Players         = game:GetService("Players")
 local PlayerGui       = Players.LocalPlayer:WaitForChild("PlayerGui")
 
-local WEBHOOK_URL = "https://discord.com/api/webhooks/1438789479006732288/KBmbNJszNPLkbkn_2JMlIqLaO1Y67XGSqz1BIrJXWtbnYd0HuGa7BSorPTGsmRfvRyzv"
+local WEBHOOK_URL = "WEBHOOK_URL_DISINI"
 local lastSent    = 0
 local COOLDOWN    = 2
 
