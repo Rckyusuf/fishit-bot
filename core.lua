@@ -118,7 +118,7 @@ local function SendWebhook(rarity, color, user, fish, weight, chance)
     if imgUrl then embed.thumbnail = { url = imgUrl } end
 
     local payload = HttpService:JSONEncode({
-        username   = "Metaverse Assistant",
+        username   = "MetaverseInfinity Assistant",
         avatar_url = "https://cdn.discordapp.com/attachments/1417502912120225902/1483757910365438143/20260120_1758_Image_Generation_simple_compose_01kfdgvazmfyhtj8x29hz580h9.png?ex=69bbc0bc&is=69ba6f3c&hm=64648ef4e7bf76a0c325483b1e9d559823aa68b412af19bb4511056d5e9f50ff&",
         embeds     = { embed }
     })
