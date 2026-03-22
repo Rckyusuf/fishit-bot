@@ -63,7 +63,7 @@ local function DetectRarity(raw)
     if string.find(raw, "rgb(0, 0, 0)",       1, true) then return "FORGOTTEN", 0x555555 end
     if string.find(raw, "rgb(24, 255, 152)",  1, true) then return "SECRET",    0x18FF98 end
     if string.find(raw, "#ff1c95",            1, true) then return "SECRET",    0xFF1C95 end
-    if string.find(raw, "rgb(255, 24, 24)",   1, true) then return "MYTHIC",    0xFF1818 end
+    if string.find(raw, "rgb(255, 23, 23)",   1, true) then return "MYTHIC",    0xFF1818 end
     if string.find(raw, "rgb(255, 185, 43)",  1, true) then return "LEGENDARY", 0xFFB92B end
     if string.find(raw, "rgb(179, 115, 248)", 1, true) then return "EPIC",      0xB373F8 end
     return nil, nil
