@@ -1,0 +1,214 @@
+-- JAGO AI - BANJIR CUAN | Fish It AFK Optimizer
+
+local Players      = game:GetService("Players")
+local StarterGui   = game:GetService("StarterGui")
+local RunService   = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
+local LocalPlayer  = Players.LocalPlayer
+local PlayerGui    = LocalPlayer:WaitForChild("PlayerGui")
+local Camera       = workspace.CurrentCamera
+
+-- ══════════════════════════════════════
+--  AUTO: BERSIHKAN MAP
+-- ══════════════════════════════════════
+local function WipeObject(obj)
+    pcall(function()
+        if obj:IsA("ParticleEmitter") or obj:IsA("Trail") or
+           obj:IsA("Fire") or obj:IsA("Sparkles") or obj:IsA("Smoke") then
+            obj.Enabled = false
+        elseif obj:IsA("Light") then
+            obj.Enabled = false
+        elseif obj:IsA("BasePart") or obj:IsA("MeshPart") then
+            obj.Material    = Enum.Material.SmoothPlastic
+            obj.Color       = Color3.fromRGB(120, 120, 120)
+            obj.Reflectance = 0
+            obj.CastShadow  = false
+            if obj:IsA("MeshPart") then obj.TextureID = "" end
+        elseif obj:IsA("Decal") or obj:IsA("Texture") or obj:IsA("Sky") then
+            obj:Destroy()
+        end
+    end)
+end
+
+for _, v in pairs(game:GetDescendants()) do WipeObject(v) end
+game.DescendantAdded:Connect(function(obj) task.wait() WipeObject(obj) end)
+
+-- ══════════════════════════════════════
+--  AUTO: RENDER & LIGHTING
+-- ══════════════════════════════════════
+settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+
+local L = game:GetService("Lighting")
+L.GlobalShadows = false
+L.Brightness    = 0.5
+for _, fx in pairs(L:GetChildren()) do
+    if fx:IsA("PostEffect") then fx.Enabled = false end
+end
+
+-- ══════════════════════════════════════
+--  AUTO: MUTE SEMUA SUARA
+-- ══════════════════════════════════════
+SoundService.RespectFilteringEnabled = true
+pcall(function() SoundService:SetListener(Enum.ListenerType.Camera) end)
+
+local function MuteSound(obj)
+    pcall(function()
+        if obj:IsA("Sound") then
+            obj.Volume = 0
+        end
+    end)
+end
+for _, v in pairs(game:GetDescendants()) do MuteSound(v) end
+game.DescendantAdded:Connect(function(obj) task.wait() MuteSound(obj) end)
+
+-- Master volume = 0
+pcall(function() SoundService.MasterVolume = 0 end)
+
+-- ══════════════════════════════════════
+--  AUTO: REMOVE RENDER SEMUA PLAYER LAIN
+-- ══════════════════════════════════════
+local function RemovePlayerRender(player)
+    if player == LocalPlayer then return end
+    pcall(function()
+        local char = player.Character
+        if char then
+            for _, part in pairs(char:GetDescendants()) do
+                if part:IsA("BasePart") or part:IsA("MeshPart") then
+                    part.LocalTransparencyModifier = 1
+                end
+            end
+        end
+    end)
+end
+
+for _, p in pairs(Players:GetPlayers()) do RemovePlayerRender(p) end
+Players.PlayerAdded:Connect(function(p)
+    p.CharacterAdded:Connect(function() task.wait(1) RemovePlayerRender(p) end)
+end)
+Players.PlayerRemoving:Connect(function() end)
+
+-- ══════════════════════════════════════
+--  AUTO: GC LOOP (Anti Force-Close)
+-- ══════════════════════════════════════
+task.spawn(function()
+    while task.wait(8) do collectgarbage("collect") end
+end)
+
+-- ══════════════════════════════════════
+--  NOTIFIKASI AWAL
+-- ══════════════════════════════════════
+task.wait(1)
+StarterGui:SetCore("SendNotification", {
+    Title    = "Banjir Cuan AFK",
+    Text     = "Optimizer aktif! Tekan tombol untuk Black Screen.",
+    Duration = 6
+})
+
+-- ══════════════════════════════════════
+--  STATE BLACK SCREEN
+-- ══════════════════════════════════════
+local isBlack       = false
+local blackGui      = nil
+local savedCamCF    = nil
+local savedCamType  = nil
+
+-- ══════════════════════════════════════
+--  UI
+-- ══════════════════════════════════════
+local Gui = Instance.new("ScreenGui")
+Gui.Name           = "BanjirCuanUI"
+Gui.ResetOnSpawn   = false
+Gui.IgnoreGuiInset = true
+Gui.DisplayOrder   = 100
+Gui.Parent         = PlayerGui
+
+local Btn = Instance.new("TextButton")
+Btn.Size             = UDim2.new(0, 130, 0, 34)
+Btn.Position         = UDim2.new(0, 10, 0.5, -17)  -- tengah kiri
+Btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+Btn.BorderSizePixel  = 0
+Btn.Text             = "⚫ Black Screen"
+Btn.TextColor3       = Color3.fromRGB(210, 210, 210)
+Btn.TextSize         = 13
+Btn.Font             = Enum.Font.GothamSemibold
+Btn.AutoButtonColor  = false
+Btn.Active           = true
+Btn.Draggable        = true
+Btn.Parent           = Gui
+
+Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 6)
+
+local Stroke = Instance.new("UIStroke", Btn)
+Stroke.Color     = Color3.fromRGB(60, 60, 60)
+Stroke.Thickness = 1
+
+-- ══════════════════════════════════════
+--  LOGIKA BLACK SCREEN + MATIKAN RENDER
+-- ══════════════════════════════════════
+Btn.MouseButton1Click:Connect(function()
+    isBlack = not isBlack
+
+    if isBlack then
+        -- Simpan state kamera asli
+        savedCamCF   = Camera.CFrame
+        savedCamType = Camera.CameraType
+
+        -- Pindahkan kamera sangat jauh → frustum culling matikan semua render
+        Camera.CameraType = Enum.CameraType.Scriptable
+        Camera.CFrame     = CFrame.new(Vector3.new(0, 9e8, 0))
+
+        -- Buat layar hitam
+        blackGui = Instance.new("ScreenGui")
+        blackGui.Name           = "BanjirCuanBlack"
+        blackGui.ResetOnSpawn   = false
+        blackGui.IgnoreGuiInset = true
+        blackGui.DisplayOrder   = 999
+        blackGui.Parent         = PlayerGui
+
+        local F = Instance.new("Frame", blackGui)
+        F.Size             = UDim2.new(1, 0, 1, 0)
+        F.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        F.BorderSizePixel  = 0
+        F.ZIndex           = 1
+
+        -- Watermark samar di tengah
+        local Wm = Instance.new("TextLabel", blackGui)
+        Wm.Size             = UDim2.new(1, 0, 0, 40)
+        Wm.Position         = UDim2.new(0, 0, 0.5, -20)
+        Wm.BackgroundTransparency = 1
+        Wm.Text             = "Jago AI Banjir Cuan"
+        Wm.TextColor3       = Color3.fromRGB(45, 45, 45)
+        Wm.TextSize         = 18
+        Wm.Font             = Enum.Font.GothamSemibold
+        Wm.TextXAlignment   = Enum.TextXAlignment.Center
+        Wm.ZIndex           = 2
+
+        -- Tombol di atas black screen
+        Gui.DisplayOrder = 1000
+
+        Btn.Text             = "🟢 Black Screen OFF"
+        Btn.TextColor3       = Color3.fromRGB(100, 230, 130)
+        Btn.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+        Stroke.Color         = Color3.fromRGB(60, 160, 80)
+
+    else
+        -- Kembalikan kamera
+        if savedCamType then
+            Camera.CameraType = savedCamType
+        end
+        if savedCamCF then
+            Camera.CFrame = savedCamCF
+        end
+        -- Biarkan kamera kembali ke default player
+        Camera.CameraType = Enum.CameraType.Custom
+
+        if blackGui then blackGui:Destroy() blackGui = nil end
+
+        Gui.DisplayOrder = 100
+        Btn.Text             = "⚫ Black Screen"
+        Btn.TextColor3       = Color3.fromRGB(210, 210, 210)
+        Btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+        Stroke.Color         = Color3.fromRGB(60, 60, 60)
+    end
+end)
+
